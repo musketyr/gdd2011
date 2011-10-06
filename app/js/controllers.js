@@ -8,13 +8,16 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	
 	this.canvasWidth = 481;
 	this.canvasHeight = 481;
-	this.step = 1000;
+	this.clockTick = 50;//;
+	this.step = 2000;
 	this.minQueryStep = 30000;
 	this.maxQueued = 100;
 	this.queue = [];
 	
 	this.initBoard = function(){
-		self.boardCanvas = new eu.appsatori.gdd2011.BoardCanvas();
+		self.clock = new eu.appsatori.gdd2011.Clock();
+		
+		self.boardCanvas = new eu.appsatori.gdd2011.BoardCanvas(self.clock);
 		self.boardCanvas.initBoard();
 		
 		self.canvasWidth  = self.boardCanvas.getCanvasSize();
@@ -43,6 +46,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 		
 		self.watcher.query();
 		nextMovement();
+		runClock();
 	};
 	
 	
@@ -89,6 +93,12 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 			$log.info("Quering for more tweets.");
 		}
 		$defer(nextMovement, self.step);
+	}
+	
+	function runClock(){
+		self.clock.tick();
+		self.$root.$eval();
+		$defer(runClock, self.clockTick);
 	}
 	
 }

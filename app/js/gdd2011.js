@@ -138,7 +138,7 @@
     };
     
     // BoardCanvas
-    eu.appsatori.gdd2011.BoardCanvas = function(config) {
+    eu.appsatori.gdd2011.BoardCanvas = function(clock, config) {
     	var self = this, c = config || {}, icon, size, background, line, canvas;
     	
     	id = c.id || 'board';
@@ -161,8 +161,18 @@
 
     		var img = new Image();
     		img.src = url;
-
-    		canvas.drawImage(img, col, row, icon, icon);
+    		
+    		clock.onTick(function(counter){
+    			var imageSize = counter + 3;
+    			
+    			if(imageSize > icon){
+    				return false;
+    			}
+    			var half = ((icon - imageSize ) / 2);
+    			canvas.drawImage(img, col + half, row + half, imageSize, imageSize);
+    			return true;
+    			
+    		});
     	};
     	
     	this.initBoard = function(){
@@ -233,6 +243,44 @@
     		var row = Math.floor(modulatedCounter / boardSize);
     		var col = modulatedCounter % boardSize;
     		return {row: row, col: col};
+    	};
+    	
+    	return this;
+    };
+    
+    // Clock
+    eu.appsatori.gdd2011.Clock = function() {
+    	var self = this;
+    	var onTickListeners = [];
+    	var onTickListenersCoutners = [];
+    	
+
+		this.tick = function() {
+			var overIndexes = [];
+			for ( var i = 0; i < onTickListeners.length; i++) {
+				var listener = onTickListeners[i];
+				if (listener != 0) {
+					var counter = onTickListenersCoutners[i];
+					counter++;
+					onTickListenersCoutners[i] = counter;
+					var over = !onTickListeners[i](counter);
+					if (over) {
+						overIndexes.push(i);
+					}
+				}
+
+			}
+			for ( var i = 0; i < overIndexes.length; i++) {
+				onTickListeners[overIndexes[i]] = 0;
+				onTickListenersCoutners[overIndexes[i]] = 0;
+			}
+		};
+    	
+    	this.onTick = function(listener){
+    		if(listener != undefined){
+    			onTickListeners.push(listener);
+    			onTickListenersCoutners.push(0);
+    		}
     	};
     	
     	return this;

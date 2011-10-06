@@ -9,13 +9,6 @@
 </head>
 <body>
 	<div class="container">
-		<div class="row">
-			<div class="span16">
-				<span ng:repeat="movement in queue.$limitTo(27).$filter(itExists)">
-				<img src="{{movement.player.getImage()}}" width="{{boardCanvas.getIcon()}}" height="{{boardCanvas.getIcon()}}"/>
-				</span>
-			</div>
-		</div>
 		<h1>Tweets for "{{watcher.getQuery()}}"</h1>
 		<div class="row">
 			<div class="span1">

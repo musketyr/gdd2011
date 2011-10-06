@@ -295,7 +295,7 @@ describe("BoardCanvas", function(){
 	  var canvas;
 	  
 	  beforeEach(function(){
-		  canvas = new eu.appsatori.gdd2011.BoardCanvas();
+		  canvas = new eu.appsatori.gdd2011.BoardCanvas(new eu.appsatori.gdd2011.Clock());
 	  });
 	
 	
@@ -304,5 +304,78 @@ describe("BoardCanvas", function(){
 		expect(canvas.getCanvasSize()).toBe(481);
 		  
 	});
+	
+});
+
+
+describe("Clock", function(){
+	var clock;
+	
+	
+	beforeEach(function(){
+		clock = new eu.appsatori.gdd2011.Clock();
+	});
+	
+	
+	it('should count size properly', function() {
+		var over = false, counter = 0, clockCounter = 0;
+		
+		expect(clock).toBeDefined();
+		
+		clock.onTick(function(suppliedCounter){
+			counter++;
+			clockCounter = suppliedCounter;
+			return !over;
+		});
+		
+		expect(counter).toBe(0);
+		expect(clockCounter).toBe(0);
+		
+		clock.tick();
+		expect(counter).toBe(1);
+		expect(clockCounter).toBe(1);
+		
+		clock.tick();
+		expect(counter).toBe(2);
+		expect(clockCounter).toBe(2);
+		
+		over = true;
+		
+		clock.tick();
+		expect(counter).toBe(3);
+		expect(clockCounter).toBe(3);
+		
+		clock.tick();
+		expect(counter).toBe(3);
+		expect(clockCounter).toBe(3);
+		
+		over = false;
+		
+		clock.onTick(function(suppliedCounter){
+			counter++;
+			clockCounter = suppliedCounter;
+			return !over;
+		});
+		
+		clock.tick();
+		expect(counter).toBe(4);
+		expect(clockCounter).toBe(1);
+		
+		clock.tick();
+		expect(counter).toBe(5);
+		expect(clockCounter).toBe(2);
+		
+		over = true;
+		
+		clock.tick();
+		expect(counter).toBe(6);
+		expect(clockCounter).toBe(3);
+		
+		clock.tick();
+		expect(counter).toBe(6);
+		expect(clockCounter).toBe(3);
+		  
+	});
+	
 	
 });
