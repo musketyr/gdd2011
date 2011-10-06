@@ -24,11 +24,10 @@ angular.service('twitterWatcher', function($xhr, $log){
 					tweets = (response.results || []).concat(tweets);
 					if(response.next_page == undefined){
 						queryString = withCallback(response.refresh_url)|| getDefaultQueryString();
-						notifyPending(tweets);
 					} else {
 						queryString = withCallback(response.next_page);
-						self.query(callback, true);
 					}
+					notifyPending(tweets);
 					
 				}, function(code, response){
 					$log.error("Reading tweets failed, Code: " + code);
@@ -75,7 +74,10 @@ angular.service('twitterWatcher', function($xhr, $log){
 		}
 
 		function withCallback(url){
-			return url + "&callback=JSON_CALLBACK";
+			$log.info(url);
+			var ret = url.replace(/&calback=angular.*/i, '') + "&callback=JSON_CALLBACK";
+			$log.info(ret);
+			return ret;
 		}
 		
 		function getDefaultQueryString(){

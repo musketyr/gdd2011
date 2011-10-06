@@ -211,22 +211,61 @@ describe("Board", function(){
   });
   
   
-  it("should have working listeners", function(){
-    var x, y, player;
+  it("should have working gain listeners", function(){
+    var x, y, eventPlayer;
     board.addListener(function(event){
       if(event.type === "gain"){
         x = event.x;
         y = event.y;
-        player = event.player;
+        eventPlayer = event.player;
       }
     });
     
     board.play(other, 5, 7);
-    expect(player).toBe(other);
+    expect(eventPlayer).toBe(other);
     expect(x).toBe(5);
     expect(y).toBe(7);
     
+    
   });
+  
+  it("should have working invalid listeners", function(){
+	    var x, y, eventPlayer;
+	    
+	    board.addListener(function(event){
+	        if(event.type === "invalid"){
+	          x = event.x;
+	          y = event.y;
+	          eventPlayer = event.player;
+	        }
+	    });
+	    
+	    board.play(other, 5, 7);
+	    board.play(player, 5, 7);
+	    expect(eventPlayer).toBe(player);
+	    expect(x).toBe(5);
+	    expect(y).toBe(7);
+	    
+	    
+	  });
+  
+  it("should have working  listeners", function(){
+	    var x, y, eventPlayer;
+	    
+	    board.addListener(function(event){
+	        if(event.type === "loose"){
+	          x = event.x;
+	          y = event.y;
+	          eventPlayer = event.player;
+	        }
+	    });
+	    
+	    board.play(player, 6, 7);
+	    board.play(other, 5, 7);
+	    expect(eventPlayer).toBe(player);
+	    expect(x).toBe(6);
+	    expect(y).toBe(7);
+	  });
 });
 
 

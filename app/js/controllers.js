@@ -8,7 +8,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	
 	this.canvasWidth = 481;
 	this.canvasHeight = 481;
-	this.clockTick = 50;//;
+	this.clockTick = 50;
 	this.step = 2000;
 	this.minQueryStep = 30000;
 	this.maxQueued = 100;
@@ -28,7 +28,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 		
 		self.board.addListener(function(event) {
 			if (event.type === "gain") {
-				self.boardCanvas.placeIcon(event.x, event.y, event.player.getImage());
+				self.boardCanvas.placeIcon(event.x, event.y, event.player.getImage(), event.originalDirection);
 				self.$root.$eval();
 			}
 		});
@@ -97,7 +97,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	
 	function runClock(){
 		self.clock.tick();
-		self.$root.$eval();
+		//self.$root.$eval();
 		$defer(runClock, self.clockTick);
 	}
 	

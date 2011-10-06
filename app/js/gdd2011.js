@@ -65,7 +65,15 @@
         var index = y * size + x;
         var oldOne = board[index];
         
+        if(oldOne != undefined){
+        	notifyListeners("invalid", player, x, y);
+        	return;
+        	
+        }
+        
+        
         board[index] = player;
+        
         
         if(oldOne != player){
           player.gainPoint();
@@ -90,8 +98,8 @@
               player.gainPoint();
               other.loosePoint();
               
-              notifyListeners("gain", player, newX, newY);
-              notifyListeners("loose", other, newX, newY);
+              notifyListeners("gain", player, newX, newY, dir);
+              notifyListeners("loose", other, newX, newY, dir);
             }
           }
         }
@@ -128,9 +136,9 @@
         }
       }
       
-      function notifyListeners(type, player, x, y){
+      function notifyListeners(type, player, x, y, originalDirection){
         for(var i = 0; i < listeners.length; i++){
-          listeners[i]({type: type, player: player, x: x, y: y});
+          listeners[i]({type: type, player: player, x: x, y: y, originalDirection: originalDirection});
         }
       }
       
@@ -153,7 +161,7 @@
     	this.getSize = function(){ return size; };
     	this.getIcon = function(){ return icon; };
     	 
-    	this.placeIcon = function(x, y, url){
+    	this.placeIcon = function(x, y, url, direction){
     		var row, col;
     		
     		row = x * icon;
@@ -163,13 +171,47 @@
     		img.src = url;
     		
     		clock.onTick(function(counter){
-    			var imageSize = counter + 3;
+    			var helper = (counter + 4);
+    			var imageSize = helper % icon + 1;
+    			if(direction != undefined && helper <= icon){
+    				return true;
+    			}
     			
-    			if(imageSize > icon){
+    			if(direction == undefined && helper >= icon || direction != undefined && helper >= 2 * icon){
     				return false;
     			}
-    			var half = ((icon - imageSize ) / 2);
-    			canvas.drawImage(img, col + half, row + half, imageSize, imageSize);
+    			var colDif, rowDif, height, width;
+    			
+    			colDif = rowDif = 0;
+    			height = width = imageSize;
+    			
+    			if(direction != undefined){
+    				if(direction.x < 0/* && direction.y != 0*/){
+    					rowDif = icon - imageSize;
+    				}
+    				if(direction.y < 0 /*&& direction.x != 0*/){
+    					colDif = icon - imageSize;
+    				}
+//    				if(direction.x > 0 /*&& direction.y != 0*/){
+//    					rowDif = 0;
+//    				}
+//    				if(direction.y > 0 /*&& direction.x != 0*/){
+//    					colDif = 0;
+//    				}
+    				if(direction.x == 0 && direction.y != 0){
+    					height = icon;
+    				}
+    				if(direction.x != 0 && direction.y == 0){
+    					width = icon;
+    				}
+    				
+    			} else {
+    				colDif = rowDif = ((icon - imageSize ) / 2);
+    			}
+    			
+    			
+    			fillWithBackground(col + colDif, row + rowDif, width, height);
+    			canvas.drawImage(img, col + colDif, row + rowDif, width, height);
     			return true;
     			
     		});
@@ -193,7 +235,12 @@
     	
     	function initCanvas(){
     		canvas.fillStyle = background;
-    		canvas.fillRect(0, 0, self.getCanvasSize(), self.getCanvasSize());
+    		fillWithBackground(0, 0, self.getCanvasSize(), self.getCanvasSize());
+    	}
+    	
+    	function fillWithBackground(col, row, width, height){
+    		canvas.fillStyle = background;
+    		canvas.fillRect(col, row, width, height);
     	}
     	
     	function drawLines() {
