@@ -1,31 +1,45 @@
-angular.service('twitterWatcher', function($xhr, $log){
+angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 	
-	this.watch = function(q){
-		self = this;
+	var Watcher = function(q, config){
+		var self = this;
 		
-		var tweets = [], queryString = getDefaultQueryString(), onTweetListners = [], pending = [];
+		var c = config || {};
 		
-		this.query = function(callback, internal){
-			var execute = internal || pending.length == 0;
+		c.from = c.from || new Date(0);
+		c.to = c.to || new Date(new Date().getTime() + (10 * 365 * 24 * 60 * 60 * 1000));
+		
+		var tweets = c.noCache ? [] : getCachedTweets(), queryString = c.noCache ? getDefaultQueryStringNoCache() : getDefaultQueryString(), onTweetListners = [], pending = [];
+		
+		var firstFromCache = !c.noCache && tweets.length > 0;
+		
+		this.query = function(callback){
+			var execute = pending.length == 0;
+
+			pending.push(callback);
 			
-			if(pending){
-				pending.push(callback);
-			}
 			if(execute){
+				if(firstFromCache){
+					notifyListeners(tweets);
+					notifyPending(tweets);
+					firstFromCache = false;
+					return tweets;
+				}
+				
 				var url = 'http://search.twitter.com/search.json' + queryString;
 				$log.info('Quering twitter: ' + url);
 				$xhr('JSON', url, function(code, response){
 					if(code != 200){
 						$log.error("Reading tweets failed, Code: " + code);
+						
 						notifyPending(tweets);
 						return [];
 					}
 					notifyListeners(response.results || []);
-					tweets = (response.results || []).concat(tweets);
+					updateTweets(response.results);
 					if(response.next_page == undefined){
-						queryString = withCallback(response.refresh_url)|| getDefaultQueryString();
+						updateQueryString(withCallback(response.refresh_url) || getDefaultQueryString());
 					} else {
-						queryString = withCallback(response.next_page);
+						updateQueryString(withCallback(response.next_page));
 					}
 					notifyPending(tweets);
 					
@@ -49,19 +63,36 @@ angular.service('twitterWatcher', function($xhr, $log){
 			return q;
 		};
 		
+		this.clearCache = function(){
+			if(!$window || !$window.localStorage){
+				return true;
+			}
+			
+			$window.localStorage[getCachedQueryStringKey()] = getDefaultQueryStringNoCache();
+			$window.localStorage[getCachedTweetsKey()] = [];
+			return true;
+		};
+		
 		return this;
 		
 		function notifyListeners(tweets){
-			 for(var i = 0; i < onTweetListners.length; i++){
-				 for(var j = 0; j < tweets.length; j++){
-					 onTweetListners[i](tweets[j]);				 
+			 for(var j = 0; j < tweets.length; j++){
+				 var tweet = tweets[j];
+				 var createdAt = Date.parse(tweet.created_at);
+				 if(c.from.getTime() <= createdAt && c.to.getTime() >= createdAt){
+					 for(var i = 0; i < onTweetListners.length; i++){
+						 onTweetListners[i](tweet);				 
+					 }
 				 }
-		     }
+			 }
 		}
 		
 		function notifyPending(tweets){
 			 for(var i = 0; i < pending.length; i++){
-				 (pending[i] || function(){})(tweets);				 
+				 (pending[i] || function(){})(angular.Array.filter(tweets, function(tweet){
+					 var createdAt = Date.parse(tweet.created_at);
+					 return c.from.getTime() <= createdAt && c.to.getTime() >= createdAt;
+				 }));				 
 		     }
 			 pending = [];
 		}
@@ -74,18 +105,74 @@ angular.service('twitterWatcher', function($xhr, $log){
 		}
 
 		function withCallback(url){
-			$log.info(url);
 			var ret = url.replace(/&calback=angular.*/i, '') + "&callback=JSON_CALLBACK";
-			$log.info(ret);
 			return ret;
 		}
 		
-		function getDefaultQueryString(){
+		function getCachedTweetsKey(){
+			return 'gdd2011.twitterWatcher.cache.' + q;
+		}
+		
+		function getCachedTweets(){
+			if(!$window || !$window.localStorage){
+				return [];
+			}
+			
+			return angular.fromJson($window.localStorage[getCachedTweetsKey()]) || [];
+		}
+		
+		function cacheTweets(tweets){
+			if(!$window || !$window.localStorage){
+				return false;
+			}
+			
+			$window.localStorage[getCachedTweetsKey()] = angular.toJson(tweets);
+			return true;
+		}
+		
+		function updateTweets(newOnes){
+			tweets = (newOnes || []).concat(tweets);
+			cacheTweets(tweets);
+		}
+		
+		function getCachedQueryStringKey(){
+			return 'gdd2011.twitterWatcher.queryString.' + q;
+		}
+		
+		function getCachedQueryString(){
+			if(!$window || !$window.localStorage){
+				return ;
+			}
+			
+			return $window.localStorage[getCachedQueryStringKey()] || getDefaultQueryStringNoCache();
+		}
+		
+		function cacheQueryString(qs){
+			if(!$window || !$window.localStorage){
+				return false;
+			}
+			
+			$window.localStorage[getCachedQueryStringKey()] = qs;
+			return true;
+		}
+		
+		function updateQueryString(qs){
+			queryString = qs;
+			cacheQueryString(qs);
+		}
+		
+		function getDefaultQueryStringNoCache(){
 			return withCallback("?q=" + escape(q));
 		}
 		
-		
+		function getDefaultQueryString(){
+			return getCachedQueryString() || getDefaultQueryStringNoCache();
+		}
+	};
+	
+	this.watch = function(q, config){
+		return new Watcher(q, config);
 	};
 	
 	return this;
-}, {$inject: ['$xhr', '$log']});
+}, {$inject: ['$xhr', '$log', '$window', '$defer']});

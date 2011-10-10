@@ -93,7 +93,7 @@
             var newY = y + dir.y;
             var otherIndex = (newY) * size + newX;
             var other = board[otherIndex];
-            if(other){
+            if(other && other != player){
                 board[otherIndex] = player;
               player.gainPoint();
               other.loosePoint();
@@ -221,6 +221,7 @@
     		canvas = getCanvas();
     		initCanvas();
     		drawLines();
+    		drawPositions();
     	};
     	
     	return this;
@@ -241,6 +242,22 @@
     	function fillWithBackground(col, row, width, height){
     		canvas.fillStyle = background;
     		canvas.fillRect(col, row, width, height);
+    	}
+    	
+    	
+    	function drawPositions(){
+    		var hunagryConstant = Math.round(icon / 10);
+    		for(var row = 0; row < size; row++){
+    			for(var col = 0; col < size; col++){
+    				drawText(row.toString(size) + col.toString(size), Math.round((col + 0.2) * icon), Math.round((row + 0.8) * icon) , icon / 2);
+    			}
+    		}
+    	}
+    	
+    	function drawText(text, col, row, height){
+    		canvas.font = height + "pt Arial sans-serif ";
+    		canvas.fillStyle = "grey";
+    		canvas.fillText(text, col, row);
     	}
     	
     	function drawLines() {

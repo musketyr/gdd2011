@@ -4,15 +4,17 @@
 function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	var self = this, 
 		canvas, 
-		loc = ($location || {search: {magic: false, q: '@gddwall'}}), lastQuery = 0;
+		loc = ($location || {search: {magic: false, q: '@gddwall', m: '@gddwall', w: '#gddcz', id: 'tw2011'}}), lastQuery = 0;
 	
 	this.canvasWidth = 481;
 	this.canvasHeight = 481;
 	this.clockTick = 50;
 	this.step = 2000;
-	this.minQueryStep = 30000;
+	this.minQueryStep = 15000;
 	this.maxQueued = 100;
 	this.queue = [];
+	this.master = loc.search.m || '@gddwall';
+	this.id = loc.search.id || 'tw2011';
 	
 	this.initBoard = function(){
 		self.clock = new eu.appsatori.gdd2011.Clock();
@@ -42,6 +44,21 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 			if(!coor.invalid){
 				queueMovement(self.board.getPlayer(tweet.from_user, tweet.profile_image_url), coor.row, coor.col, tweet.text);
 			}
+		});
+		
+		self.masterWatcher = twitterWatcher.watch('from:' + self.master + ' ' + self.id);
+		
+		self.masterWatcher.onTweet(function(tweet){
+			var command = tweet.text.replace(self.id, '');
+			$log.info("Command from master: " + command);
+			self.$eval(command);
+		});
+		
+		self.clock.onTick(function(counter){
+			if((counter * self.clockTick) %  self.minQueryStep <= self.clockTick){
+				self.masterWatcher.query();
+			}
+			return true;
 		});
 		
 		self.watcher.query();
@@ -97,7 +114,6 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	
 	function runClock(){
 		self.clock.tick();
-		//self.$root.$eval();
 		$defer(runClock, self.clockTick);
 	}
 	
