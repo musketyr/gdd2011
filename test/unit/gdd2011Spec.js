@@ -265,7 +265,27 @@ describe("Board", function(){
 	    expect(eventPlayer).toBe(player);
 	    expect(x).toBe(6);
 	    expect(y).toBe(7);
-	  });
+   });
+  
+  it("should have working end game listeners", function(){
+	    var end = false;
+	    
+	    board.addListener(function(event){
+	        if(event.type === "end"){
+	          end = true;
+	        }
+	    });
+	    
+	   for(var i = 0; i < board.getSize() ; i++){
+		   for(var j = 0; j < board.getSize() ; j++){
+			   expect(end).toBeFalsy();
+			   board.play((i + j) % 2 == 0 ? player : other, i, j);
+		   }
+	   }
+	   expect(end).toBeTruthy();
+ }); 
+  
+  
 });
 
 

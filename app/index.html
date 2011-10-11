@@ -3,7 +3,7 @@
 	xmlns:gdd="http://labs.appsatori.eu/gdd2011" ng:controller="GddBoardCtrl">
 <head>
 <meta charset="utf-8">
-<title>my angular app</title>
+<title>GDD 2011 Twitter Wall &amp; Game</title>
 <link rel="stylesheet" href="css/app.css" />
 <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css">
 </head>
@@ -21,13 +21,17 @@
 				<canvas id="board" height="{{canvasHeight}}" width="{{canvasWidth}}"></canvas>
 			</div>
 			<div class="span6">
-				<div ng:repeat="movement in queue.$limitTo(5).$filter(itExists)">
-				<img src="{{movement.player.getImage()}}" width="{{boardCanvas.getIcon()}}" height="{{boardCanvas.getIcon()}}"/>
-				<p><strong>{{movement.player.getName()}}</strong>&nbsp;{{movement.text}}</p>
+				<div ng:repeat="tweet in wallTweets.$limitTo(wallTweetsMaxCount).reverse()">
+				<img src="{{tweet.profile_image_url}}" width="{{boardCanvas.getIcon()}}" height="{{boardCanvas.getIcon()}}"/>
+				<p><strong>{{tweet.from_user}}</strong>&nbsp;{{tweet.text | html}}</p>
 				</div>
 			</div>
 		</div>
+		<footer>
+			<span ng:show="winner">Latest winner: {{winner.getName()}}</span>
+		</footer>
 	</div>
+
 
 	
 	<script src="js/gdd2011.js" ng:autobind></script>

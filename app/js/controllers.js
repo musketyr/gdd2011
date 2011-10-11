@@ -12,9 +12,48 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	this.step = 2000;
 	this.minQueryStep = 15000;
 	this.maxQueued = 100;
+	this.wallStep = 150;
 	this.queue = [];
 	this.master = loc.search.m || '@gddwall';
 	this.id = loc.search.id || 'tw2011';
+	this.wallTweetsMaxCount = 5;
+	this.wallQuery = loc.search.w || '#gddcz';
+	this.wallTweets = [];
+	this.winner = null;
+	
+	this.normal = function(){
+		self.clockTick = 50;
+		self.step = 2000;
+		self.minQueryStep = 15000;
+	};
+	
+	this.slow = function(){
+		self.clockTick = 250;
+		self.step = 10000;
+		self.minQueryStep = 60000;
+	};
+	
+	this.quick = function(){
+		self.clockTick = 10;
+		self.step = 400;
+		self.minQueryStep = 3000;
+	};
+	
+	this.turbo = function(){
+		self.clockTick = 10;
+		self.step = 80;
+		self.minQueryStep = 1000;
+	};
+	
+	this.restart = function(){
+		var winners = angular.Array.orderBy(self.board.getPlayers(), self.getPlayerPoints, true);
+		if(winners.length > 0){
+			$log.info(winners);
+			self.winner = winners[0];
+			$log.info(self.winner);
+		}
+		self.initBoard();
+	};
 	
 	this.initBoard = function(){
 		self.clock = new eu.appsatori.gdd2011.Clock();
@@ -31,11 +70,28 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 		self.board.addListener(function(event) {
 			if (event.type === "gain") {
 				self.boardCanvas.placeIcon(event.x, event.y, event.player.getImage(), event.originalDirection);
-				self.$root.$eval();
+				//self.$root.$eval();
+			}
+			if (event.type === "end"){
+				self.restart();
+
 			}
 		});
+		
+		// hack to init a few players on the left side
+		self.board.getPlayer('appsatori', 'https://si0.twimg.com/profile_images/1133886792/miniico.png');
+		self.board.getPlayer('inmite', 'https://si0.twimg.com/profile_images/107147982/inmite.png');
+		self.board.getPlayer('google', 'https://si0.twimg.com/profile_images/77186109/favicon.png');
+		self.board.getPlayer('android', 'https://si0.twimg.com/profile_images/1565848902/android_logo__1_.gif');
+		self.board.getPlayer('angularjs', 'https://si0.twimg.com/profile_images/1143997916/ng-logo.png');
+		self.board.getPlayer('app_engine', 'https://si0.twimg.com/profile_images/58079916/appengine_lowres.jpg');
+		self.board.getPlayer('googledocs', 'https://si0.twimg.com/profile_images/1157545737/docs-128.png');
+		self.board.getPlayer('googlemaps', 'https://si0.twimg.com/profile_images/1565887810/MapsPin.png');
+		
+		
 
-		self.watcher = twitterWatcher.watch(loc.search.q || '@gddwall');
+		self.watcher = twitterWatcher.watch(loc.search.q || '@gddwall', {from: loc.search.magic ? new Date(0) : new Date(), noCache: !loc.search.magic});
+		self.watcher.clearCache();
 		
 		self.parser = new eu.appsatori.gdd2011.TwitterParser(loc.search.magic);
 		
@@ -46,17 +102,44 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 			}
 		});
 		
-		self.masterWatcher = twitterWatcher.watch('from:' + self.master + ' ' + self.id);
+		self.masterWatcher = twitterWatcher.watch('from:' + self.master + ' ' + self.id, {from: new Date(), noCache: true});
+		self.masterWatcher.clearCache();
 		
 		self.masterWatcher.onTweet(function(tweet){
 			var command = tweet.text.replace(self.id, '');
 			$log.info("Command from master: " + command);
-			self.$eval(command);
+			try {
+				self.$eval(command);
+			} catch (e){
+				$log.error(e);
+			}
+		});
+		
+		if(self.wallQuery == self.watcher.getQuery()){
+			self.wallWatcher = self.watcher;
+		} else {
+			self.wallWatcher = twitterWatcher.watch(self.wallQuery);
+		}
+		
+		self.wallWatcher.onTweet(function(tweet){
+			self.wallTweets.push(tweet);
 		});
 		
 		self.clock.onTick(function(counter){
+			if(counter % self.wallStep == 0){
+				if(self.wallTweets.length > self.wallTweetsMaxCount){
+					self.wallTweets.shift();
+				} else {
+					self.wallTweets.push(self.wallTweets.shift());
+				}
+			}
+			return true;
+		});
+
+		self.clock.onTick(function(counter){
 			if((counter * self.clockTick) %  self.minQueryStep <= self.clockTick){
 				self.masterWatcher.query();
+				self.wallWatcher.query();
 			}
 			return true;
 		});

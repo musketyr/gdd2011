@@ -34,7 +34,7 @@
       this.getPoints = function(){
         return points;
       };
-
+      
         return this;
     };
   
@@ -45,6 +45,7 @@
       var indexes = {};
       var players = [];
       var listeners = [];
+      var occupied = 0;
       
       var directions = {
         left_upper:  {x: -1,  y: -1, test: function(x,y){ return x > 0       && y > 0      ; } },
@@ -126,23 +127,36 @@
     	  return players;
       };
       
+      this.getSize = function(){
+    	  return size;
+      };
+      
       this.addListener = function(listener){
         listeners.push(listener);
       };
+      
+      this.addListener(function(event){
+	      if(event.type === "gain" && event.originalDirection == undefined){
+	    	  occupied++;
+	    	  if(occupied == size * size){
+	    		  notifyListeners("end", event.player, event.x, event.y, event.originalDirection);
+	    	  }
+		  }
+      });
      
+      return this;
+      
       function assertSize(x, variableName){
-        if(x > size - 1 || x < 0) {
-          throw variableName + " must be between 0 and " + (size - 1) + " but was " + x;
-        }
+    	  if(x > size - 1 || x < 0) {
+    		  throw variableName + " must be between 0 and " + (size - 1) + " but was " + x;
+    	  }
       }
       
       function notifyListeners(type, player, x, y, originalDirection){
-        for(var i = 0; i < listeners.length; i++){
-          listeners[i]({type: type, player: player, x: x, y: y, originalDirection: originalDirection});
-        }
+    	  for(var i = 0; i < listeners.length; i++){
+    		  listeners[i]({type: type, player: player, x: x, y: y, originalDirection: originalDirection});
+    	  }
       }
-      
-      return this;
     };
     
     // BoardCanvas
@@ -170,6 +184,8 @@
     		var img = new Image();
     		img.src = url;
     		
+    		var initialized = false;
+    		
     		clock.onTick(function(counter){
     			var helper = (counter + 4);
     			var imageSize = helper % icon + 1;
@@ -192,12 +208,6 @@
     				if(direction.y < 0 /*&& direction.x != 0*/){
     					colDif = icon - imageSize;
     				}
-//    				if(direction.x > 0 /*&& direction.y != 0*/){
-//    					rowDif = 0;
-//    				}
-//    				if(direction.y > 0 /*&& direction.x != 0*/){
-//    					colDif = 0;
-//    				}
     				if(direction.x == 0 && direction.y != 0){
     					height = icon;
     				}
@@ -223,6 +233,7 @@
     		drawLines();
     		drawPositions();
     	};
+    	
     	
     	return this;
     	
@@ -327,7 +338,12 @@
 					var counter = onTickListenersCoutners[i];
 					counter++;
 					onTickListenersCoutners[i] = counter;
-					var over = !onTickListeners[i](counter);
+					var over = true;
+					try{
+						var over = !onTickListeners[i](counter);
+					} catch(e) {
+						// ok over is true
+					}
 					if (over) {
 						overIndexes.push(i);
 					}

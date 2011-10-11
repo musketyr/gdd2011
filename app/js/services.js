@@ -114,19 +114,20 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 		}
 		
 		function getCachedTweets(){
-			if(!$window || !$window.localStorage){
-				return [];
-			}
-			
-			return angular.fromJson($window.localStorage[getCachedTweetsKey()]) || [];
+//			if(!$window || !$window.localStorage){
+//				return [];
+//			}
+//			
+//			return angular.fromJson($window.localStorage[getCachedTweetsKey()]) || [];
+			return [];
 		}
 		
 		function cacheTweets(tweets){
-			if(!$window || !$window.localStorage){
-				return false;
-			}
-			
-			$window.localStorage[getCachedTweetsKey()] = angular.toJson(tweets);
+//			if(!$window || !$window.localStorage){
+//				return false;
+//			}
+//			
+//			$window.localStorage[getCachedTweetsKey()] = angular.toJson(tweets);
 			return true;
 		}
 		
@@ -140,19 +141,20 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 		}
 		
 		function getCachedQueryString(){
-			if(!$window || !$window.localStorage){
-				return ;
-			}
-			
-			return $window.localStorage[getCachedQueryStringKey()] || getDefaultQueryStringNoCache();
+//			if(!$window || !$window.localStorage){
+//				return ;
+//			}
+//			
+//			return $window.localStorage[getCachedQueryStringKey()] || getDefaultQueryStringNoCache();
+			return getDefaultQueryStringNoCache();
 		}
 		
 		function cacheQueryString(qs){
-			if(!$window || !$window.localStorage){
-				return false;
-			}
-			
-			$window.localStorage[getCachedQueryStringKey()] = qs;
+//			if(!$window || !$window.localStorage){
+//				return false;
+//			}
+//			
+//			$window.localStorage[getCachedQueryStringKey()] = qs;
 			return true;
 		}
 		
