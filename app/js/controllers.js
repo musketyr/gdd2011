@@ -20,6 +20,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	this.wallQuery = loc.search.w || '#gddcz';
 	this.wallTweets = [];
 	this.winner = null;
+	this.startDate =  loc.search.magic ? new Date(0) : new Date();
 	
 	this.normal = function(){
 		self.clockTick = 50;
@@ -51,6 +52,11 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 			$log.info(winners);
 			self.winner = winners[0];
 			$log.info(self.winner);
+		}
+		if(self.queue.length > 0){
+			self.startDate = self.queue[self.queue.length - 1].time;
+		} else {
+			self.startDate = new Date();
 		}
 		self.initBoard();
 	};
@@ -90,7 +96,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 		
 		
 
-		self.watcher = twitterWatcher.watch(loc.search.q || '@gddwall', {from: loc.search.magic ? new Date(0) : new Date(), noCache: !loc.search.magic});
+		self.watcher = twitterWatcher.watch(loc.search.q || '@gddwall', {from: self.startDate, noCache: !loc.search.magic});
 		self.watcher.clearCache();
 		
 		self.parser = new eu.appsatori.gdd2011.TwitterParser(loc.search.magic);
@@ -98,7 +104,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 		self.watcher.onTweet(function(tweet){
 			var coor = self.parser.parseCoordinates(tweet.text, self.boardCanvas.getSize());
 			if(!coor.invalid){
-				queueMovement(self.board.getPlayer(tweet.from_user, tweet.profile_image_url), coor.row, coor.col, tweet.text);
+				queueMovement(self.board.getPlayer(tweet.from_user, tweet.profile_image_url), coor.row, coor.col, tweet.text, Date.parse(tweet.created_at));
 			}
 		});
 		
@@ -170,8 +176,8 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	$defer(this.initBoard, 1000);
 	return this;
 	
-	function queueMovement(player, row, col, text){
-		return self.queue.push({player: player, row: row, col: col, text: text});
+	function queueMovement(player, row, col, text, time){
+		return self.queue.push({player: player, row: row, col: col, text: text, time: new Date(time)});
 	}
 	
 	function dequeueMovement(){

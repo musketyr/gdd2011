@@ -1,0 +1,7 @@
+Chrome: Runner reset.
+
+Total 0 tests (Passed: 0; Fails: 0; Errors: 0) (0,00 ms)
+  Chrome 14.0.835.186 Linux: Run 2 tests (Passed: 0; Fails: 0; Errors 2) (0,00 ms)
+    error loading file: /test/test/lib/angular/angular-scenario.js:0: Script error.
+    error loading file: /test/test/lib/angular/jstd-scenario-adapter.js:191: Uncaught ReferenceError: angular is not defined
+Tests failed: Tests failed. See log for details.
