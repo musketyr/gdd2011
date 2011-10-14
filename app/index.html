@@ -22,7 +22,7 @@
 				<div id="canvasDiv"><canvas id="board" height="{{canvasHeight}}" width="{{canvasWidth}}"></canvas></div>
 				
 				<div id="playersList" class="span1">
-				<div ng:repeat="player in board.getPlayers().$orderBy(getPlayerPoints, true).$limitTo(8).$filter(itExists)">
+				<div ng:repeat="player in board.getPlayers().$orderBy(getPlayerPoints, true).$limitTo(7).$filter(itExists)">
 				<em style="font-size: smaller;">{{getShortPlayerName(player)}} ({{player.getPoints()}})</em><br />
 				<img src="{{player.getImage()}}" width="{{boardCanvas.getIcon()}}" height="{{boardCanvas.getIcon()}}"/>
 				</div>
