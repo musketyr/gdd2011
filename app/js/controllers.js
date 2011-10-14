@@ -4,7 +4,7 @@
 function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	var self = this, 
 		canvas, 
-		loc = ($location || {search: {magic: false, q: '@gddwall', m: '@gddwall', w: '#gddcz', id: 'tw2011'}}), lastQuery = 0;
+		loc = ($location || {search: {magic: false, q: '@gddwall', m: '@gddwall', w: '#gddcz', id: 'tw2011', h: 'gddcz'}}), lastQuery = 0;
 	
 	this.canvasWidth = 481;
 	this.canvasHeight = 481;
@@ -16,12 +16,13 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	this.queue = [];
 	this.master = loc.search.m || '@gddwall';
 	this.id = loc.search.id || 'tw2011';
-	this.wallTweetsMaxCount = 5;
+	this.wallTweetsMaxCount = 7;
 	this.wallQuery = loc.search.w || '#gddcz';
 	this.wallTweets = [];
 	this.winner = null;
 	this.startDate =  loc.search.magic ? new Date(0) : new Date();
 	this.finished = false;
+	this.highlight = loc.search.h || 'gddcz';
 	
 	this.normal = function(){
 		self.clockTick = 50;
@@ -151,10 +152,11 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 			return true;
 		});
 		
+		runClock();
+
 		$defer(function(){ 
 			self.watcher.query(); 
 			nextMovement();
-			runClock();
 			self.finished = false;
 		},self.boardCanvas.getStartAnimationDuration()) ;
 	};
@@ -173,6 +175,17 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	
 	this.getShortPlayerName = function(player){
 		return player.getName().substring(0, Math.min(3, player.getName().length - 1));
+	};
+	
+	this.tweetClasses = function(tweet){
+		var classes = ['tweet'];
+		if(tweet != undefined && tweet.from_user === self.highlight){
+			classes.push('gdd');
+		}
+		if(tweet != undefined && tweet.from_user === (self.winner || {getName: function(){return '';}}).getName()){
+			classes.push('king');
+		}
+		return classes.join(' ');
 	};
 	
 	

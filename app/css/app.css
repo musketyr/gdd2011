@@ -1,3 +1,5 @@
+
+
 /* app css stylesheet */
 
 .menu {
@@ -28,3 +30,189 @@
   content: "";
   padding: 0;
 }
+
+
+/* AppSatori stylesheet */
+
+
+
+body {
+background-image: url("../img/gddwall_header.png");
+background-repeat: no-repeat;
+background-position: left top;
+font-family: "Open Sans";
+}
+
+
+#monitor {
+background-image: url("../img/gddwall_monitor.png");
+background-repeat: no-repeat;
+background-position: left top;
+order: 1px solid red;
+display: block;
+width: 570px;
+height: 700px;
+padding: 10px;
+adding-left: 45px;
+margin: 15px;
+margin-top: 40px;
+position: relative;
+display: block;
+}
+
+
+#monitor h2 {
+margin-left: 13px;
+margin-bottom: 3px;
+}
+
+#canvasDiv {
+	padding-left: 10px;	
+}
+
+#korunka {
+position: absolute;
+top: 35px;
+right: 40px;
+}
+
+
+
+#playersList {
+position: absolute;
+top: 75px;
+right: 27px;
+width: 50px;
+}
+
+
+#playersList div:first-child img {
+border: 5px solid #e1b800;
+-moz-border-radius: 4px;
+-webkit-border-radius: 4px;
+border-radius: 4px;
+}
+
+#playersList img {
+border: 4px solid white;
+}
+
+#playersList em {
+font-size: 95%;
+}
+
+h3 {
+position: absolute;
+bottom: 110px;
+left: 20px;
+font-weight: 100;
+font-size: 130%;
+}
+
+h3 strong{
+font-weight: 900;
+}
+
+
+
+#mobile {
+background-image: url("../img/gddwall_mobile.png");
+background-repeat: no-repeat;
+background-position: left top;
+order: 1px solid blue;
+width: 370px;
+height: 700px;
+position: absolute;
+left: 630px;
+top: 38px;
+}
+
+
+#screen {
+margin-top: 75px;
+margin-left: 20px;
+display: block;
+width: 316px;
+height:520px;
+order: 1px solid green;
+overflow: hidden;
+}
+
+
+
+
+
+#screen img {
+border: 4px solid white;
+}
+
+
+.king {
+background-color: #FAEFBE;
+color: #B59400;
+}
+
+.king img {
+border: 4px solid #e1b800!important;
+-moz-border-radius: 4px;
+-webkit-border-radius: 4px;
+border-radius: 4px;
+}
+
+
+
+
+
+
+.gdd {
+background-color: #E6F3FC;
+color: #0053ab;
+}
+
+
+.gdd img {
+border: 4px solid #0053ab!important;
+-moz-border-radius: 4px;
+-webkit-border-radius: 4px;
+border-radius: 4px;
+}
+
+
+
+
+
+ 
+
+
+
+.tweet img {
+float: left;
+}
+
+.tweet {
+font-size: 90%;
+border-bottom: 1px solid #F2F2F2;
+}
+
+
+#screen p {
+display: block;
+margin-left: 43px;
+}
+
+
+#gradient {
+position: absolute;
+bottom: 100px;
+left: 18px;
+order: 1px solid red;
+z-index: 10;
+}
+
+
+
+h1 {
+display: none;
+}
+
+

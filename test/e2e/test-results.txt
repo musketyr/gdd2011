@@ -1,4 +1,0 @@
-Chrome: Runner reset.
-
-Total 0 tests (Passed: 0; Fails: 0; Errors: 0) (0,00 ms)
-Tests failed: No tests executed.

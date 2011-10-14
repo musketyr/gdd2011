@@ -5,31 +5,44 @@
 <meta charset="utf-8">
 <title>GDD 2011 Twitter Wall &amp; Game</title>
 <link rel="stylesheet" href="css/app.css" />
-<link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 </head>
 <body>
+
+
 	<div class="container">
 		<h1>Tweets for "{{watcher.getQuery()}}"</h1>
 		<div class="row">
-			<div class="span1">
-				<div ng:repeat="player in board.getPlayers().$orderBy(getPlayerPoints, true).$limitTo(9).$filter(itExists)">
-				<em style="font-size: smaller;">{{getShortPlayerName(player)}} ({{player.getPoints()}})</em>
+		
+      			
+			<div class="span9" id="monitor">
+			<h2>Twitter battle</h2>
+			
+			  <img id="korunka" src="./img/gdd_korunka.png" />
+				<div id="canvasDiv"><canvas id="board" height="{{canvasHeight}}" width="{{canvasWidth}}"></canvas></div>
+				
+				<div id="playersList" class="span1">
+				<div ng:repeat="player in board.getPlayers().$orderBy(getPlayerPoints, true).$limitTo(8).$filter(itExists)">
+				<em style="font-size: smaller;">{{getShortPlayerName(player)}} ({{player.getPoints()}})</em><br />
 				<img src="{{player.getImage()}}" width="{{boardCanvas.getIcon()}}" height="{{boardCanvas.getIcon()}}"/>
 				</div>
 			</div>
-			<div class="span9" id="canvasDiv">
-				<canvas id="board" height="{{canvasHeight}}" width="{{canvasWidth}}"></canvas>
+			<h3>Send coordinates (e.g. <strong>#ab</strong>) to <strong>@gddwall</strong></h3>
 			</div>
-			<div class="span6">
-				<div ng:repeat="tweet in wallTweets.$limitTo(wallTweetsMaxCount).reverse()">
+			
+			<div class="span6" id="mobile">
+			  
+			  <div id="screen">
+				<div ng:repeat="tweet in wallTweets.$limitTo(wallTweetsMaxCount).reverse()" ng:class="tweetClasses(tweet)">
 				<img src="{{tweet.profile_image_url}}" width="{{boardCanvas.getIcon()}}" height="{{boardCanvas.getIcon()}}"/>
 				<p><strong>{{tweet.from_user}}</strong>&nbsp;{{tweet.text | html}}</p>
 				</div>
+				
+			
+				
+				</div>
 			</div>
 		</div>
-		<footer>
-			<span ng:show="winner">Latest winner: {{winner.getName()}}</span>
-		</footer>
 	</div>
 
 

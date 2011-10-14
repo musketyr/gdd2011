@@ -1,3 +1,0 @@
-............................
-Total 28 tests (Passed: 28; Fails: 0; Errors: 0) (29,00 ms)
-  Chrome 14.0.835.202 Linux: Run 28 tests (Passed: 28; Fails: 0; Errors 0) (29,00 ms)
