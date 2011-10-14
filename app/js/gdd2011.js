@@ -475,7 +475,7 @@
     	    			height: self.getIcon(),
     	    			fill: "grey",
     	    			opacity: 1,
-    	    			font: "" + (self.getIcon() / 2) + "pt Arial sans-serif "
+    	    			font: "" + (self.getIcon() / 2) + "pt 'Open Sans', sans-serif "
     	    		});
     	    		txNode.animateFrom('x', Math.round(self.getCanvasSize() / 2 - icon / 2), self.getStartAnimationDuration(), 'sine');
     	    		txNode.animateFrom('y', Math.round(self.getCanvasSize() / 2 - icon / 2), self.getStartAnimationDuration(), 'sine');
