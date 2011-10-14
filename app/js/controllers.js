@@ -16,7 +16,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	this.queue = [];
 	this.master = loc.search.m || '@gddwall';
 	this.id = loc.search.id || 'tw2011';
-	this.wallTweetsMaxCount = 5;
+	this.wallTweetsMaxCount = 7;
 	this.wallQuery = loc.search.w || '#gddcz';
 	this.wallTweets = [];
 	this.winner = null;
