@@ -4,7 +4,7 @@
 function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	var self = this, 
 		canvas, 
-		loc = ($location || {search: {magic: false, q: '@gddwall', m: '@gddwall', w: '#gddcz', id: 'tw2011', h: 'gddcz'}}), lastQuery = 0;
+		loc = ($location || {search: {magic: false, q: '@gddwall', m: '@gddwall', w: '#gdd2011', id: 'tw2011', h: 'gddcz'}}), lastQuery = 0;
 	
 	this.canvasWidth = 481;
 	this.canvasHeight = 481;
@@ -130,6 +130,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 		}
 		
 		self.wallWatcher.onTweet(function(tweet){
+			window.console.log(tweet);
 			self.wallTweets.push(tweet);
 		});
 		

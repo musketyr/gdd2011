@@ -24,7 +24,7 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 					firstFromCache = false;
 					return tweets;
 				}
-				fetchGoogleStream();
+				//fetchGoogleStream();
 
 				var url = 'http://search.twitter.com/search.json' + queryString;
 				$log.info('Quering twitter: ' + url);
@@ -78,21 +78,22 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 		return this;
 		
 		function notifyListeners(tweets, service){
-			 for(var j = 0; j < tweets.length; j++){
-				 var tweet = tweets[j];
-				 if ('google' == service){
-				   tweet.text = tweet.object.content;
-				   tweet.createdAt = Date.parse(tweet.published);
-				   tweet.profile_image_url = tweet.actor.image.url + "?sz=100";
-				   tweet.from_user = tweet.actor.displayName;
-				 } else {
-				   tweet.createAt = Date.parse(tweet.created_at);
-				 }
-				 if(c.from.getTime() <= tweet.createdAt && c.to.getTime() >= tweet.createdAt){
-					 for(var i = 0; i < onTweetListners.length; i++){
-						 if (tweet.text) {
-							 onTweetListners[i](tweet);
-						 }
+			for(var j = 0; j < tweets.length; j++){
+				var tweet = tweets[j];
+				if ('google' == service){
+					tweet.text = tweet.object.content;
+					tweet.created_at = Date.prototype.parseRFC3339(tweet.published);
+					tweet.profile_image_url = tweet.actor.image.url + "?sz=100";
+					tweet.from_user = tweet.actor.displayName;
+					} else {
+					tweet.created_at = Date.parse(tweet.created_at);
+					}
+					tweet.service = service;
+					if(c.from.getTime() <= tweet.created_at && c.to.getTime() >= tweet.created_at){
+						for(var i = 0; i < onTweetListners.length; i++){
+							if (tweet.text) {
+								onTweetListners[i](tweet);
+							}
 					 }
 				 }
 			 }
@@ -117,15 +118,18 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 					notifyPending(tweets);
 					return [];
 				}
-
 				c.pageToken = response.nextPageToken;
 				notifyListeners(response.items || [], 'google');
-				updateTweets(response.items);
-				c.pageToken = response.nextPageToken;
+				if (response.items) {
+					updateTweets(response.items);
+					c.pageToken = response.nextPageToken;
+				} else {
+					c.pageToken = null;
+				}
 				notifyPending(tweets);
 			}, function(code, response){
-			$log.error("Reading tweets failed, Code: " + code);
-			notifyPending(tweets);
+				$log.error("Reading tweets failed, Code: " + code);
+				notifyPending(tweets);
 			});
 		}
 
@@ -134,7 +138,7 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 				 (pending[i] || function(){})(angular.Array.filter(tweets, function(tweet){
 					 var createdAt = Date.parse(tweet.created_at);
 					 return c.from.getTime() <= createdAt && c.to.getTime() >= createdAt;
-				 }));				 
+				 }));
 		     }
 			 pending = [];
 		}
