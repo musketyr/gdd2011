@@ -91,7 +91,6 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 				 if(c.from.getTime() <= tweet.createdAt && c.to.getTime() >= tweet.createdAt){
 					 for(var i = 0; i < onTweetListners.length; i++){
 						 if (tweet.text) {
-							 window.console.log(tweet.text);
 							 onTweetListners[i](tweet);
 						 }
 					 }
