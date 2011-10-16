@@ -130,7 +130,6 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 		}
 		
 		self.wallWatcher.onTweet(function(tweet){
-			window.console.log(tweet);
 			self.wallTweets.push(tweet);
 		});
 		
