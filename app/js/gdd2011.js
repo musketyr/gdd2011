@@ -38,6 +38,58 @@
         return this;
     };
   
+    // RegularMatrix
+    eu.appsatori.gdd2011.RegularMatrix = function(dimension) {
+      var self = this;
+    	
+      var size = dimension;
+      var table = [];
+    
+      this.eachItem = function(iter){
+      	for (var i = 0; i < table.length; i++) {
+			var item = table[i];
+			if(item == 0 || item == undefined){
+				continue;
+			}
+			iter(item);
+		}
+      };
+      
+      this.put = function(item, x, y){
+        assertSize(x, "X");
+        assertSize(y, "Y");
+        
+        var oldOne = self.get(x,y);
+        
+        table[computeIndex(x,y)] = item;
+
+        return oldOne;
+      };
+      
+      this.get = function(x, y){
+        assertSize(x, "X");
+        assertSize(y, "Y");
+        return table[computeIndex(x,y)];
+      };
+      
+      this.getSize = function(){
+    	  return size;
+      };
+      
+      return this;
+      
+      function computeIndex(x, y){
+    	  return y * size + x;
+      }
+      
+      function assertSize(x, variableName){
+    	  if(x > size - 1 || x < 0) {
+    		  throw variableName + " must be between 0 and " + (size - 1) + " but was " + x;
+    	  }
+      }
+    };
+    
+    
     // Board
     eu.appsatori.gdd2011.Board = function() {
       var size = 16;
@@ -71,7 +123,6 @@
         	return;
         	
         }
-        
         
         board[index] = player;
         
@@ -234,6 +285,18 @@
     		drawPositions();
     	};
     	
+    	this.gameOver = function(){
+    		self.initBoard();
+    	};
+    	
+    	this.getFinalAnimationDuration = function(){
+    		return 0;
+    	};
+    	
+    	this.getStartAnimationDuration = function(){
+    		return 0;
+    	};
+    	
     	
     	return this;
     	
@@ -289,6 +352,140 @@
     	
     };
     
+    // CakeBoardCanvas
+    eu.appsatori.gdd2011.CakeBoardCanvas = function(clock, config) {
+    	var self = this, c = config || {}, icon, size, background, line, canvas, matrix;
+    	
+    	id = c.id || 'board';
+    	
+    	icon = c.icon || 30;
+    	size = c.size || 16;
+    	
+    	background = c.background || 'whiteSmoke';
+    	line = c.line || {color: "#ccc", stroke:  0.5 };
+    	matrix = new eu.appsatori.gdd2011.RegularMatrix(size);
+    	
+    	this.getCanvasSize = function(){ return icon * size ; };
+    	this.getSize = function(){ return size; };
+    	this.getIcon = function(){ return icon; };
+    	
+    	// x,y is switched in here :/
+    	this.placeIcon = function(y, x, url, direction){
+    		var img = new Image();
+    		img.src = url;
+    		
+    		var imgIcon = new ImageNode(img,{
+    			dX: x * icon,
+    			dY: y * icon,
+    			dWidth: icon,
+    			dHeight: icon,
+    			opacity: 1
+    		});
+    		
+    		if(direction == undefined){
+    			direction = {x: 0,  y: 0 };
+    		}
+    		
+    		var tween = 'sproing', time = 1000 + (Math.random() * 0.3 + 0.7) *  1000 * (Math.abs(direction.x) + Math.abs(direction.y));
+    		imgIcon.animateFrom('dWidth', 0, time, tween);
+    		imgIcon.animateFrom('dHeight', 0, time, tween);
+    		imgIcon.animateFrom('dX', x * icon + icon / 2 - direction.y * icon, time, tween);
+    		imgIcon.animateFrom('dY', y * icon + icon / 2 - direction.x * icon, time, tween);
+    		imgIcon.animateFrom('opacity', 0.5, time, 'linear');
+    		canvas.append(imgIcon);
+    		
+    		var oldIcon = matrix.put(imgIcon, x, y);
+    		if(oldIcon != undefined){
+    			oldIcon.animateTo('opacity', 0, time, 'linear');
+    		}
+    	};
+    	
+    	this.initBoard = function(){
+    		canvas = createCanvas();
+    		createBoard();
+    	};
+    	
+    	this.getFinalAnimationDuration = function(){
+    		return 15000;
+    	};
+
+    	this.getStartAnimationDuration = function(){
+    		return 5000;
+    	};
+    	
+    	this.gameOver = function(){
+    		var blurTime = self.getFinalAnimationDuration();
+    		matrix.eachItem(function(img){
+    			img.animateTo('opacity', 0, blurTime, 'square');
+    			img.animateTo('dWidth', 4 * Math.random() * icon, blurTime, 'square');
+    			img.animateTo('dHeight', 4 * Math.random() * icon, blurTime, 'square');
+    			img.animateTo('dX', 4 * (Math.random() - 0.5) * self.getCanvasSize(), blurTime, 'square');
+    			img.animateTo('dY', 4 * (Math.random() - 0.5) * self.getCanvasSize(), blurTime, 'square');
+    		});
+    	};
+    	
+    	
+    	return this;
+    	
+    	function createCanvas(){
+    		var board = document.getElementById('canvasDiv');
+    		var children = [];
+    		
+    		for ( var i = 0; i < board.childNodes.length; i++) {
+				children.push(board.childNodes[i]);
+			}
+    		
+    		for ( var i = 0; i < children.length; i++) {
+				board.removeChild(children[i]);
+			}
+    		
+    		if(!board){
+    			throw "Canvas with id " + id + " is not present. Cannot draw board!";
+    		}
+    		
+    		return new Canvas(board, self.getCanvasSize(), self.getCanvasSize());
+    	}
+    	
+    	function createBoard(){
+    		var boardBg = new Rectangle(self.getCanvasSize(), self.getCanvasSize(), {fill: background});
+    		canvas.append(boardBg);
+    		
+    		for ( var x = 0; x <= self.getCanvasSize(); x += icon) {
+    			var l = new Line(x, 0, x, self.getCanvasSize(), {stroke: line.color, strokeWidth: line.stroke});
+    			l.animateFrom('y1', Math.round(self.getCanvasSize() / 2), self.getStartAnimationDuration(), 'cube');
+    			l.animateFrom('y2', Math.round(self.getCanvasSize() / 2), self.getStartAnimationDuration(), 'cube');
+    			canvas.append(l);
+    		}
+    		
+    		for ( var y = 0; y <= self.getCanvasSize(); y += icon) {
+    			var l = new Line(0, y, self.getCanvasSize(), y, {stroke: line.color, strokeWidth: line.stroke});
+    			l.animateFrom('x1', Math.round(self.getCanvasSize() / 2), self.getStartAnimationDuration(), 'cube');
+    			l.animateFrom('x2', Math.round(self.getCanvasSize() / 2), self.getStartAnimationDuration(), 'cube');
+    			canvas.append(l);
+    		}
+    		
+    		for(var row = 0; row < size; row++){
+    			for(var col = 0; col < size; col++){
+    	    		var txNode = new TextNode(row.toString(size) + col.toString(size), {
+    	    			x: col * self.getIcon() + (self.getIcon() / 2), 
+    	    			y: row * self.getIcon() + (self.getIcon() / 2), 
+    	    			textAlign: 'center', 
+    	    			textBaseline: 'middle', 
+    	    			width: self.getIcon(),
+    	    			height: self.getIcon(),
+    	    			fill: "grey",
+    	    			opacity: 1,
+    	    			font: "" + (self.getIcon() / 2) + "pt 'Open Sans', sans-serif "
+    	    		});
+    	    		txNode.animateFrom('x', Math.round(self.getCanvasSize() / 2 - icon / 2), self.getStartAnimationDuration(), 'sine');
+    	    		txNode.animateFrom('y', Math.round(self.getCanvasSize() / 2 - icon / 2), self.getStartAnimationDuration(), 'sine');
+    	    		txNode.animateFrom('opacity', 0, self.getStartAnimationDuration(), 'sine');
+    	    		canvas.append(txNode);
+    			}
+    		}
+    	}
+    	
+    };
     
     // TwitterParser
     eu.appsatori.gdd2011.TwitterParser = function(magic) {

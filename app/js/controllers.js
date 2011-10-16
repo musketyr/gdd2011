@@ -4,7 +4,7 @@
 function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	var self = this, 
 		canvas, 
-		loc = ($location || {search: {magic: false, q: '@gddwall', m: '@gddwall', w: '#gddcz', id: 'tw2011'}}), lastQuery = 0;
+		loc = ($location || {search: {magic: false, q: '@gddwall', m: '@gddwall', w: '#gddcz', id: 'tw2011', h: 'gddcz'}}), lastQuery = 0;
 	
 	this.canvasWidth = 481;
 	this.canvasHeight = 481;
@@ -16,11 +16,13 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	this.queue = [];
 	this.master = loc.search.m || '@gddwall';
 	this.id = loc.search.id || 'tw2011';
-	this.wallTweetsMaxCount = 5;
+	this.wallTweetsMaxCount = 7;
 	this.wallQuery = loc.search.w || '#gddcz';
 	this.wallTweets = [];
 	this.winner = null;
 	this.startDate =  loc.search.magic ? new Date(0) : new Date();
+	this.finished = false;
+	this.highlight = loc.search.h || 'gddcz';
 	
 	this.normal = function(){
 		self.clockTick = 50;
@@ -47,24 +49,24 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	};
 	
 	this.restart = function(){
+		self.finished = true;
 		var winners = angular.Array.orderBy(self.board.getPlayers(), self.getPlayerPoints, true);
 		if(winners.length > 0){
-			$log.info(winners);
 			self.winner = winners[0];
-			$log.info(self.winner);
 		}
 		if(self.queue.length > 0){
 			self.startDate = self.queue[self.queue.length - 1].time;
 		} else {
 			self.startDate = new Date();
 		}
-		self.initBoard();
+		self.boardCanvas.gameOver();
+		$defer(self.initBoard, self.boardCanvas.getFinalAnimationDuration());
 	};
 	
 	this.initBoard = function(){
 		self.clock = new eu.appsatori.gdd2011.Clock();
 		
-		self.boardCanvas = new eu.appsatori.gdd2011.BoardCanvas(self.clock);
+		self.boardCanvas = new eu.appsatori.gdd2011.CakeBoardCanvas(self.clock);
 		self.boardCanvas.initBoard();
 		
 		self.canvasWidth  = self.boardCanvas.getCanvasSize();
@@ -150,9 +152,13 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 			return true;
 		});
 		
-		self.watcher.query();
-		nextMovement();
 		runClock();
+
+		$defer(function(){ 
+			self.watcher.query(); 
+			nextMovement();
+			self.finished = false;
+		},self.boardCanvas.getStartAnimationDuration()) ;
 	};
 	
 	
@@ -169,6 +175,17 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	
 	this.getShortPlayerName = function(player){
 		return player.getName().substring(0, Math.min(3, player.getName().length - 1));
+	};
+	
+	this.tweetClasses = function(tweet){
+		var classes = ['tweet'];
+		if(tweet != undefined && tweet.from_user === self.highlight){
+			classes.push('gdd');
+		}
+		if(tweet != undefined && tweet.from_user === (self.winner || {getName: function(){return '';}}).getName()){
+			classes.push('king');
+		}
+		return classes.join(' ');
 	};
 	
 	
@@ -189,7 +206,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	
 	function nextMovement(){
 		var movement = dequeueMovement();
-		if(movement){
+		if(movement && !self.finished){
 			self.board.play(movement.player, movement.row, movement.col);
 		}
 		lastQuery += self.step;
@@ -203,7 +220,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	
 	function runClock(){
 		self.clock.tick();
-		$defer(runClock, self.clockTick);
+		$defer(runClock, self.clockTick );
 	}
 	
 }

@@ -288,6 +288,47 @@ describe("Board", function(){
   
 });
 
+describe("RegularMatrix", function(){
+	var matrix, itemA, itemB;
+
+	beforeEach(function() {
+		matrix = new eu.appsatori.gdd2011.RegularMatrix(16);
+		itemA = {
+			name : "A"
+		};
+		itemB = {
+			name : "A"
+		};
+	});
+
+		  
+	it("Matrix should defined", function() {
+		expect(matrix).toBeDefined();
+	});
+	  
+	  it("Matrix be able to put and get", function() {   
+	    expect(matrix.put).toBeDefined();
+	    expect(matrix.get).toBeDefined();
+	    
+	    expect(function(){ matrix.put(itemA, 16, 0); }).toThrow("X must be between 0 and 15 but was 16");
+	    expect(function(){ matrix.put(itemA, 0, 18); }).toThrow("Y must be between 0 and 15 but was 18");
+	    
+	    expect(matrix.put(itemA, 5,5)).toBeUndefined();
+	    
+	    
+	    expect(function(){ matrix.get(20, 0); }).toThrow("X must be between 0 and 15 but was 20");
+	    expect(function(){ matrix.get(0, 17); }).toThrow("Y must be between 0 and 15 but was 17");
+	    
+	    expect(matrix.get(5, 5).name).toBe(itemA.name);
+	    
+	    var oldVal = matrix.put(itemB, 5, 5);
+	    
+	    expect(oldVal).toBeDefined();
+	    expect(oldVal.name).toBe(itemA.name);
+	   
+	 });
+});
+
 
 describe("TwitterParser", function(){
 	  var parser;
