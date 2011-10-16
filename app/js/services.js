@@ -19,22 +19,24 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 			
 			if(execute){
 				if(firstFromCache){
-					notifyListeners(tweets);
+					notifyListeners(tweets, 'twitter');
 					notifyPending(tweets);
 					firstFromCache = false;
 					return tweets;
 				}
-				
+				fetchGoogleStream();
+
 				var url = 'http://search.twitter.com/search.json' + queryString;
 				$log.info('Quering twitter: ' + url);
+
 				$xhr('JSON', url, function(code, response){
 					if(code != 200){
 						$log.error("Reading tweets failed, Code: " + code);
-						
+
 						notifyPending(tweets);
 						return [];
 					}
-					notifyListeners(response.results || []);
+					notifyListeners(response.results || [], 'twitter');
 					updateTweets(response.results);
 					if(response.next_page == undefined){
 						updateQueryString(withCallback(response.refresh_url) || getDefaultQueryString());
@@ -42,7 +44,7 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 						updateQueryString(withCallback(response.next_page));
 					}
 					notifyPending(tweets);
-					
+
 				}, function(code, response){
 					$log.error("Reading tweets failed, Code: " + code);
 					notifyPending(tweets);
@@ -75,18 +77,59 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 		
 		return this;
 		
-		function notifyListeners(tweets){
+		function notifyListeners(tweets, service){
 			 for(var j = 0; j < tweets.length; j++){
 				 var tweet = tweets[j];
-				 var createdAt = Date.parse(tweet.created_at);
-				 if(c.from.getTime() <= createdAt && c.to.getTime() >= createdAt){
+				 if ('google' == service){
+				   tweet.text = tweet.object.content;
+				   tweet.createdAt = Date.parse(tweet.published);
+				   tweet.profile_image_url = tweet.actor.image.url + "?sz=100";
+				   tweet.from_user = tweet.actor.displayName;
+				 } else {
+				   tweet.createAt = Date.parse(tweet.created_at);
+				 }
+				 if(c.from.getTime() <= tweet.createdAt && c.to.getTime() >= tweet.createdAt){
 					 for(var i = 0; i < onTweetListners.length; i++){
-						 onTweetListners[i](tweet);				 
+						 if (tweet.text) {
+							 window.console.log(tweet.text);
+							 onTweetListners[i](tweet);
+						 }
 					 }
 				 }
 			 }
 		}
 		
+		function fetchGoogleStream(){
+			var params = [
+				'key=AIzaSyCCywTPKC8ndXjk2ReXzpCG4-uiSVrODsk',
+				'query=gdd2011',
+				'sortBy=recent',
+				'callback=JSON_CALLBACK'
+			];
+
+			if(c.pageToken) {
+				params.push('pageToken=' + c.pageToken);
+			}
+			var url = 'https://www.googleapis.com/plus/v1/activities?' + params.join('&');
+			$log.info('Quering google+: ' + url);
+			$xhr('JSON', url, function(code, response){
+				if(code != 200){
+					$log.error("Failed to fetch activities from google, Code: " + code);
+					notifyPending(tweets);
+					return [];
+				}
+
+				c.pageToken = response.nextPageToken;
+				notifyListeners(response.items || [], 'google');
+				updateTweets(response.items);
+				c.pageToken = response.nextPageToken;
+				notifyPending(tweets);
+			}, function(code, response){
+			$log.error("Reading tweets failed, Code: " + code);
+			notifyPending(tweets);
+			});
+		}
+
 		function notifyPending(tweets){
 			 for(var i = 0; i < pending.length; i++){
 				 (pending[i] || function(){})(angular.Array.filter(tweets, function(tweet){

@@ -104,7 +104,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 		self.watcher.onTweet(function(tweet){
 			var coor = self.parser.parseCoordinates(tweet.text, self.boardCanvas.getSize());
 			if(!coor.invalid){
-				queueMovement(self.board.getPlayer(tweet.from_user, tweet.profile_image_url), coor.row, coor.col, tweet.text, Date.parse(tweet.created_at));
+				queueMovement(self.board.getPlayer(tweet.from_user, tweet.profile_image_url), coor.row, coor.col, tweet.text, tweet.created_at);
 			}
 		});
 		
