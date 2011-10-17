@@ -24,7 +24,7 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 					firstFromCache = false;
 					return tweets;
 				}
-				//fetchGoogleStream();
+				fetchGoogleStream();
 
 				var url = 'http://search.twitter.com/search.json' + queryString;
 				$log.info('Quering twitter: ' + url);
@@ -86,7 +86,7 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 					tweet.profile_image_url = tweet.actor.image.url + "?sz=100";
 					tweet.from_user = tweet.actor.displayName;
 					} else {
-					tweet.created_at = Date.parse(tweet.created_at);
+						tweet.created_at = Date.parse(tweet.created_at);
 					}
 					tweet.service = service;
 					if(c.from.getTime() <= tweet.created_at && c.to.getTime() >= tweet.created_at){

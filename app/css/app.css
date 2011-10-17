@@ -197,6 +197,15 @@ font-size: 90%;
 border-bottom: 1px solid #F2F2F2;
 }
 
+.google-logo {
+background:url("../img/google_icon.png") no-repeat 0 0;
+background-position: right bottom;
+}
+
+.twitter-logo{
+background:url("../img/twitter_icon.png") no-repeat 0 0;
+background-position: right bottom;
+}
 
 #screen p {
 display: block;

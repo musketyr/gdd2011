@@ -36,7 +36,7 @@
 			  <div id="screen">
 				<div ng:repeat="tweet in wallTweets.$limitTo(wallTweetsMaxCount).reverse()" ng:class="tweetClasses(tweet)">
 				<img src="{{tweet.profile_image_url}}" width="{{boardCanvas.getIcon()}}" height="{{boardCanvas.getIcon()}}"/>
-				<p><strong>{{tweet.from_user}}</strong>&nbsp;{{tweet.text | html}}</p>
+				<p class="{{tweet.service}}-logo"><strong>{{tweet.from_user}}</strong>&nbsp;{{tweet.text | html}}</p>
 				</div>
 				
 			
