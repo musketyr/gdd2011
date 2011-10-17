@@ -6,7 +6,7 @@
 <title>GDD 2011 Stream Wall &amp; Game</title>
 <link rel="stylesheet" href="css/app.css" />
 <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-<script src="lib/dateutils.js"></script>
+<script src="lib/dateutils.js" type="text/javascript"></script>
 </head>
 <body>
 
@@ -28,7 +28,7 @@
 				<img src="{{player.getImage()}}" width="{{boardCanvas.getIcon()}}" height="{{boardCanvas.getIcon()}}"/>
 				</div>
 			</div>
-			<h3>Send coordinates (e.g. <strong>#ab</strong>) to <strong>@gddwall</strong></h3>
+			<h3>Send coordinates (e.g. <strong>#ab</strong>) to <strong>@gddwall</strong> and wait</h3>
 			</div>
 			
 			<div class="span6" id="mobile">
@@ -36,7 +36,7 @@
 			  <div id="screen">
 				<div ng:repeat="tweet in wallTweets.$limitTo(wallTweetsMaxCount).reverse()" ng:class="tweetClasses(tweet)">
 				<img src="{{tweet.profile_image_url}}" width="{{boardCanvas.getIcon()}}" height="{{boardCanvas.getIcon()}}"/>
-				<p class="{{tweet.service}}-logo"><strong>{{tweet.from_user}}</strong>&nbsp;{{tweet.text | html}}</p>
+				<p><strong>{{tweet.from_user}}</strong>&nbsp;{{tweet.text | html}}</p>
 				</div>
 				
 			

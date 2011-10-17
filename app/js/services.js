@@ -24,7 +24,9 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 					firstFromCache = false;
 					return tweets;
 				}
-				fetchGoogleStream();
+				if(c.gplusQuery != undefined){
+					fetchGoogleStream();
+				}
 
 				var url = 'http://search.twitter.com/search.json' + queryString;
 				$log.info('Quering twitter: ' + url);
@@ -102,7 +104,7 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 		function fetchGoogleStream(){
 			var params = [
 				'key=AIzaSyCCywTPKC8ndXjk2ReXzpCG4-uiSVrODsk',
-				'query=gdd2011',
+				'query=' + c.gplusQuery,
 				'sortBy=recent',
 				'callback=JSON_CALLBACK'
 			];
@@ -128,7 +130,7 @@ angular.service('twitterWatcher', function($xhr, $log, $window, $defer){
 				}
 				notifyPending(tweets);
 			}, function(code, response){
-				$log.error("Reading tweets failed, Code: " + code);
+				$log.error("Reading google plus posts failed, Code: " + code);
 				notifyPending(tweets);
 			});
 		}

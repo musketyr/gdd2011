@@ -4,7 +4,7 @@
 function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	var self = this, 
 		canvas, 
-		loc = ($location || {search: {magic: false, q: '@gddwall', m: '@gddwall', w: '#gdd2011', id: 'tw2011', h: 'gddcz'}}), lastQuery = 0;
+		loc = ($location || {search: {magic: false, q: '@gddwall', m: '@gddwall', w: '#gdd2011', id: 'tw2011', h: 'gddcz', g: 'gdd2011'}}), lastQuery = 0;
 	
 	this.canvasWidth = 481;
 	this.canvasHeight = 481;
@@ -18,11 +18,13 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	this.id = loc.search.id || 'tw2011';
 	this.wallTweetsMaxCount = 7;
 	this.wallQuery = loc.search.w || '#gddcz';
+	this.gplusQuery = loc.search.g || 'gdd2011';
 	this.wallTweets = [];
 	this.winner = null;
 	this.startDate =  loc.search.magic ? new Date(0) : new Date();
 	this.finished = false;
 	this.highlight = loc.search.h || 'gddcz';
+	this.lastTweetTime = 0;
 	
 	this.normal = function(){
 		self.clockTick = 50;
@@ -126,7 +128,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 		if(self.wallQuery == self.watcher.getQuery()){
 			self.wallWatcher = self.watcher;
 		} else {
-			self.wallWatcher = twitterWatcher.watch(self.wallQuery);
+			self.wallWatcher = twitterWatcher.watch(self.wallQuery, {gplusQuery: self.gplusQuery});
 		}
 		
 		self.wallWatcher.onTweet(function(tweet){
@@ -179,6 +181,9 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	
 	this.tweetClasses = function(tweet){
 		var classes = ['tweet'];
+		if(tweet != undefined){
+			classes.push(tweet.service + '-logo');
+		}
 		if(tweet != undefined && tweet.from_user === self.highlight){
 			classes.push('gdd');
 		}
@@ -186,6 +191,25 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 			classes.push('king');
 		}
 		return classes.join(' ');
+	};
+	
+	this.gameDelay = function(){
+		if(self.lastTweetTime == 0){
+			return '';
+		}
+		var deltaSec  = Math.floor((new Date().getTime() - self.lastTweetTime) / 1000);
+		var seconds = deltaSec % 60;
+		var minutes = Math.floor(deltaSec / 60);
+		// translate this if needed
+		if(seconds == 1 && minutes == 0){
+			return "Last movement tweeted 1 second ago";
+		} else if(seconds > 1 && minutes == 0){
+			return "Last movement tweeted " + seconds + " seconds ago";
+		}  else if(minutes == 1){
+			return "Last movement tweeted 1 minute ago";
+		} else if(minutes > 1){
+			return "Last movement tweeted " + minutes + " minutes ago";
+		}
 	};
 	
 	
@@ -207,6 +231,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	function nextMovement(){
 		var movement = dequeueMovement();
 		if(movement && !self.finished){
+			self.lastTweetTime = movement.time;
 			self.board.play(movement.player, movement.row, movement.col);
 		}
 		lastQuery += self.step;
