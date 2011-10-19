@@ -4,7 +4,7 @@
 function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	var self = this, 
 		canvas, 
-		loc = ($location || {search: {magic: false, q: '@gddwall', m: '@gddwall', w: '#gdd2011', id: 'tw2011', h: 'gddcz', g: 'gdd2011'}}), lastQuery = 0;
+		loc = ($location || {search: {magic: false, q: '@gddwall', m: 'gddwall', w: '#gdd2011', id: 'tw2011', h: 'gddcz', g: 'gdd2011'}}), lastQuery = 0;
 	
 	this.canvasWidth = 481;
 	this.canvasHeight = 481;
@@ -14,7 +14,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	this.maxQueued = 100;
 	this.wallStep = 150;
 	this.queue = [];
-	this.master = loc.search.m || '@gddwall';
+	this.master = loc.search.m || 'gddwall';
 	this.id = loc.search.id || 'tw2011';
 	this.wallTweetsMaxCount = 7;
 	this.wallQuery = loc.search.w || '#gddcz';
@@ -128,7 +128,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 		if(self.wallQuery == self.watcher.getQuery()){
 			self.wallWatcher = self.watcher;
 		} else {
-			self.wallWatcher = twitterWatcher.watch(self.wallQuery, {gplusQuery: self.gplusQuery});
+			self.wallWatcher = twitterWatcher.watch(self.wallQuery, {gplusQuery: self.gplusQuery/*, from: new Date(new Date.getTime() - 1000 * 60 * 30)*/});
 		}
 		
 		self.wallWatcher.onTweet(function(tweet){
@@ -176,7 +176,7 @@ function GddBoardCtrl(twitterWatcher, $log, $location, $defer) {
 	};
 	
 	this.getShortPlayerName = function(player){
-		return player.getName().substring(0, Math.min(3, player.getName().length - 1));
+		return player.getName().substring(0, Math.min(15, player.getName().length));
 	};
 	
 	this.tweetClasses = function(tweet){

@@ -1,7 +1,27 @@
-Chrome: Runner reset.
+java.lang.RuntimeException: Connection error on: sun.net.www.protocol.http.HttpURLConnection:http://localhost:9877/jstd/proxyUnexpected Runner Condition: Connection error on: sun.net.www.protocol.http.HttpURLConnection:http://localhost:9877/jstd/proxy
+ Use --runnerMode DEBUG for more information.
+	at com.google.jstestdriver.HttpServer.postJson(HttpServer.java:124)
+	at com.google.jstestdriver.action.ConfigureProxyAction.run(ConfigureProxyAction.java:56)
+	at com.google.jstestdriver.ActionRunner.runActions(ActionRunner.java:64)
+	at com.google.jstestdriver.JsTestDriver.main(JsTestDriver.java:85)
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.PlainSocketImpl.doConnect(PlainSocketImpl.java:351)
+	at java.net.PlainSocketImpl.connectToAddress(PlainSocketImpl.java:213)
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:200)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:366)
+	at java.net.Socket.connect(Socket.java:529)
+	at java.net.Socket.connect(Socket.java:478)
+	at sun.net.NetworkClient.doConnect(NetworkClient.java:163)
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:394)
+	at sun.net.www.http.HttpClient.openServer(HttpClient.java:529)
+	at sun.net.www.http.HttpClient.<init>(HttpClient.java:233)
+	at sun.net.www.http.HttpClient.New(HttpClient.java:306)
+	at sun.net.www.http.HttpClient.New(HttpClient.java:323)
+	at sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(HttpURLConnection.java:970)
+	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:911)
+	at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:836)
+	at sun.net.www.protocol.http.HttpURLConnection.getOutputStream(HttpURLConnection.java:1014)
+	at com.google.jstestdriver.HttpServer.postJson(HttpServer.java:116)
+	... 3 more
 
-Total 0 tests (Passed: 0; Fails: 0; Errors: 0) (0,00 ms)
-  Chrome 14.0.835.202 Linux: Run 2 tests (Passed: 0; Fails: 0; Errors 2) (0,00 ms)
-    error loading file: /test/test/lib/angular/angular-scenario.js:0: Script error.
-    error loading file: /test/test/lib/angular/jstd-scenario-adapter.js:191: Uncaught ReferenceError: angular is not defined
-Tests failed: Tests failed. See log for details.

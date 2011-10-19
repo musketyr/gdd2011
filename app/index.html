@@ -17,18 +17,18 @@
 		
       			
 			<div class="span9" id="monitor">
-			<h2>Twitter battle</h2>
+<!-- 			<h2>Send coordinates (e.g. <strong id="coor">#ab</strong>) to <strong>@gddwall</strong> and wait</h2> -->
 			
 			  <img id="korunka" src="./img/gdd_korunka.png" />
 				<div id="canvasDiv"><canvas id="board" height="{{canvasHeight}}" width="{{canvasWidth}}"></canvas></div>
 				
 				<div id="playersList" class="span1">
 				<div ng:repeat="player in board.getPlayers().$orderBy(getPlayerPoints, true).$limitTo(7).$filter(itExists)">
-				<em style="font-size: smaller;">{{getShortPlayerName(player)}} ({{player.getPoints()}})</em><br />
-				<img src="{{player.getImage()}}" width="{{boardCanvas.getIcon()}}" height="{{boardCanvas.getIcon()}}"/>
+				<em>{{getShortPlayerName(player)}} ({{player.getPoints()}})</em><br />
+				<img src="{{player.getImage()}}" width="{{boardCanvas.getIcon() + 5}}" height="{{boardCanvas.getIcon() + 5}}"/>
 				</div>
 			</div>
-			<h3>Send coordinates (e.g. <strong>#ab</strong>) to <strong>@gddwall</strong> and wait</h3>
+			<h3>Send coordinates (e.g. <strong>#ab</strong>) to <strong>@gddwall</strong> and wait a few seconds</h3>
 			</div>
 			
 			<div class="span6" id="mobile">

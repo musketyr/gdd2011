@@ -43,46 +43,54 @@ background-position: left top;
 font-family: "Open Sans";
 }
 
+.container {
+width: 1250px;
+margin: 0 auto;
+order: 2px solid green;
+padding: 20px;
+}
+
 
 #monitor {
-background-image: url("../img/gddwall_monitor.png");
+background-image: url("../img/gddwall_monitor3.png");
 background-repeat: no-repeat;
 background-position: left top;
 order: 1px solid red;
 display: block;
-width: 570px;
-height: 700px;
+height: 685px;
 padding: 10px;
-adding-left: 30px;
-argin: 15px;
-margin-top: 25px;
 position: relative;
 display: block;
+width: 800px;
+float: left;
 }
 
 
 #monitor h2 {
-margin-left: 13px;
-margin-bottom: 3px;
+margin-left: 30px;
+margin-bottom: 0px;
 }
 
 #canvasDiv {
-	padding-left: 10px;	
+margin-left: 150px;
+margin-top: 42px;
 }
+
 
 #korunka {
 position: absolute;
-top: 35px;
-right: 35px;
+top: 20px;
+right: 70px;
 }
 
 
 
 #playersList {
 position: absolute;
-top: 75px;
+top: 56px;
+width: 130px;
 right: 25px;
-width: 60px;
+margin-left: 10px;
 text-align: center;
 }
 
@@ -100,19 +108,19 @@ margin-left: 5px;
 }
 
 #playersList em {
-font-size: 95%;
+font-size: 60%;
 margin: 0 auto;
 }
 
 h3 {
 position: absolute;
-bottom: 110px;
-left: 20px;
+bottom: 90px;
+left: 90px;
 font-weight: 100;
 font-size: 130%;
 }
 
-h3 strong{
+h3 strong {
 font-weight: 900;
 }
 
@@ -124,10 +132,10 @@ background-repeat: no-repeat;
 background-position: left top;
 order: 1px solid blue;
 width: 370px;
-height: 700px;
-position: absolute;
-right: 10%;
-top: 25px;
+height: 690px;
+position: relative;
+float: left;
+margin-left: 35px;
 }
 
 
@@ -141,7 +149,7 @@ order: 1px solid green;
 overflow: hidden;
 }
 
-
+ 
 
 
 

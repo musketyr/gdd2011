@@ -358,7 +358,7 @@
     	
     	id = c.id || 'board';
     	
-    	icon = c.icon || 30;
+    	icon = c.icon || 31;
     	size = c.size || 16;
     	
     	background = c.background || 'whiteSmoke';
